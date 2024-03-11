@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grocery List</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+h1 {
+  text-align: center;
+}
+
+.input-group {
+display: flex;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  padding: 10px;
+  width: calc(100% - 80px);
+  border: 1px solid #ccc;
+  border-radius: 5px 0 0 5px;
+}
+
+button {
+  
+  padding: 10px 20px;
+  border: none;
+  border-radius: 0 5px 5px 0;
+  background-color: #4caf50;
+  color: white;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 10px 0;
+  border-bottom: 1px solid #ccc;
+  position: relative;
+}
+
+.clear-btn-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+#clearItemsBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ff5733;
+  color: white;
+  cursor: pointer;
+}
+
+#clearItemsBtn:hover {
+  background-color: #ff8966;
+}
+
+.edit-icon,
+.delete-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.edit-icon {
+  right: 30px;
+}
+
+.delete-icon {
+  right: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Grocery List</h1>
+  <div class="input-group">
+    <input type="text" id="itemInput" placeholder="Enter item">
+    <button id="addItemBtn">Add Item</button>
+  </div>
+  <ul id="items"></ul>
+  <button id="clearItemsBtn">Clear Items</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  let groceryList = JSON.parse(localStorage.getItem('groceryList')) || [];
+  displayItems(groceryList);
+
+  document.getElementById("addItemBtn").addEventListener("click", function() {
+    addItem();
+  });
+
+  document.getElementById("clearItemsBtn").addEventListener("click", function() {
+    clearItems();
+  });
+});
+
+function addItem() {
+  let newItem = document.getElementById("itemInput").value.trim();
+  if (newItem !== "") {
+    let groceryList = JSON.parse(localStorage.getItem('groceryList')) || [];
+    groceryList.push(newItem);
+    localStorage.setItem('groceryList', JSON.stringify(groceryList));
+    displayItems(groceryList);
+    document.getElementById("itemInput").value = "";
+  }
+}
+
+function deleteItem(index) {
+  let groceryList = JSON.parse(localStorage.getItem('groceryList')) || [];
+  groceryList.splice(index, 1);
+  localStorage.setItem('groceryList', JSON.stringify(groceryList));
+  displayItems(groceryList);
+}
+
+function editItem(index) {
+  let groceryList = JSON.parse(localStorage.getItem('groceryList')) || [];
+  let editedItem = prompt("Edit item:", groceryList[index]);
+  if (editedItem !== null) {
+    groceryList[index] = editedItem.trim();
+    localStorage.setItem('groceryList', JSON.stringify(groceryList));
+    displayItems(groceryList);
+  }
+}
+
+function clearItems() {
+  localStorage.removeItem('groceryList');
+  document.getElementById("items").innerHTML = "";
+}
+
+function displayItems(groceryList) {
+  let list = document.getElementById("items");
+  list.innerHTML = "";
+  groceryList.forEach(function(item, index) {
+    let listItem = document.createElement("li");
+    listItem.textContent = item;
+
+    let editIcon = document.createElement("span");
+    editIcon.innerHTML = "&#9998;";
+    editIcon.classList.add("edit-icon");
+    editIcon.onclick = function() {
+      editItem(index);
+    };
+
+    let deleteIcon = document.createElement("span");
+    deleteIcon.innerHTML = "&#10006;";
+    deleteIcon.classList.add("delete-icon");
+    deleteIcon.onclick = function() {
+      deleteItem(index);
+    };
+
+    listItem.appendChild(editIcon);
+    listItem.appendChild(deleteIcon);
+    list.appendChild(listItem);
+  });
+}
+</script>
+
+</body>
+</html>
